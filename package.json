@@ -1,0 +1,23 @@
+{
+  "name": "bun-social",
+  "version": "1.0.50",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "bun run --watch src/index.ts",
+    "sai": "bun run --watch src/index.ts"
+  },
+  "dependencies": {
+    "@elysiajs/swagger": "^0.7.3",
+    "@prisma/client": "5.4.2",
+    "elysia": "latest",
+    "jose": "^4.15.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.8.8",
+    "bun-types": "latest",
+    "prisma": "^5.5.2",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2"
+  },
+  "module": "src/index.js"
+}
