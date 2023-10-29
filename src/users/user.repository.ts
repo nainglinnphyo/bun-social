@@ -1,10 +1,31 @@
-
+import { PrismaClient } from "@prisma/client";
 
 export class UsersRepository {
-  constructor() {}
+  constructor(private readonly prismaService: PrismaClient) {}
 
-  async findAll() {
-    return [];
+  async register({
+    username,
+    password,
+    email,
+  }: {
+    username: string;
+    password: string;
+    email: string;
+  }) {
+    return this.prismaService.user.create({
+      data: {
+        email: email,
+        name: username,
+        password: await Bun.password.hash(password),
+      },
+    });
   }
 
+  async login({ email, password }: { email: string; password: string }) {
+    return this.prismaService.user.findFirstOrThrow({
+      where: {
+        email: email,
+      },
+    });
+  }
 }

@@ -1,31 +1,65 @@
-// users.service.ts
-// in charge of business logic - generate slug, fetch data from other services, cache something, etcimport { NotFoundError } from 'elysia';
-
-import { NotFoundError } from "elysia";
 import { UsersRepository } from "./user.repository";
 import { AuthService } from "@/auth/auth.service";
-import { PrismaClient } from "@prisma/client";
+import { AuthenticationError, BadRequestError, NotFoundError } from "@/errors";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
-enum UserType {
-  ADMIN = "ADMIN",
-  ENDUSER = "ENDUSER",
-  EMPLOYEE = "EMPLOYEE",
-}
 export class UsersService {
   constructor(
     private readonly repository: UsersRepository,
-    private readonly authService: AuthService,
-    private readonly prismaService: PrismaClient
+    private readonly authService: AuthService
   ) {}
 
-  async findAll() {
-    // return this.repository.findAll();
+  async register(userDto: {
+    name: string;
+    email: string;
+    password: string;
+  }): Promise<{ accessToken: string } | any> {
+    try {
+      const user = await this.repository.register({
+        email: userDto.email,
+        password: userDto.password,
+        username: userDto.name,
+      });
+      if (user) {
+        const token = await this.authService.generateToken({
+          id: user.id,
+          email: user.email,
+        });
+        return {
+          accessToken: token,
+        };
+      }
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        throw new BadRequestError("Email is already taken");
+      }
+      throw error;
+    }
   }
 
-  async createEndUser() {
-    return this.authService.generateToken({
-      id: "123",
-      email: "nlp@gmail.com",
-    });
+  async login(loginDto: {
+    email: string;
+    password: string;
+  }): Promise<{ accessToken: string } | any> {
+    try {
+      const user = await this.repository.login({
+        email: loginDto.email,
+        password: loginDto.password,
+      });
+      const token = await this.authService.generateToken({
+        id: user.id,
+        email: user.email,
+      });
+      return {
+        accessToken: token,
+      };
+    } catch (error) {
+      console.log(error);
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error.code === "P2025") throw new NotFoundError("User not found");
+        throw new AuthenticationError("Email or password not valid");
+      }
+      throw error;
+    }
   }
 }

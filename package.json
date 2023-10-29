@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "@elysiajs/swagger": "^0.7.3",
-    "@prisma/client": "5.4.2",
+    "@prisma/client": "^5.5.2",
     "elysia": "latest",
     "jose": "^4.15.4"
   },

@@ -10,21 +10,35 @@ export const authPlugin = new Elysia().use(setupUsers).group(
   },
   (app) =>
     app
-      // app.get("/",
-      // ({ store }) => store.usersService.findAll(),
-      // )
-      // app.post("login", ({ store }) => store.usersService.createEndUser())
-      .post("/register", ({ body }) => body, {
+      .post(
+        "/register",
+        ({ body, store }) => store.usersService.register(body),
+        {
+          body: t.Object({
+            name: t.String(),
+            email: t.String(),
+            password: t.String(),
+          }),
+          detail: {
+            summary: "Register",
+          },
+          response: {
+            200: t.Object({
+              accessToken: t.String(),
+            }),
+            400: t.Object({
+              error: t.String(),
+            }),
+          },
+        }
+      )
+      .post("/login", ({ body, store }) => store.usersService.login(body), {
         body: t.Object({
-          username: t.String(),
           email: t.String(),
           password: t.String(),
         }),
-      })
-      .post("/login", ({ body }) => body, {
-        body: t.Object({
-          email: t.String(),
-          password: t.String(),
-        }),
+        detail: {
+          summary: "Login",
+        },
       })
 );
