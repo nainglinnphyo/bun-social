@@ -44,8 +44,12 @@ export class UsersService {
     try {
       const user = await this.repository.login({
         email: loginDto.email,
-        password: loginDto.password,
       });
+      const isMatch = await Bun.password.verify(
+        loginDto.password,
+        user.password
+      );
+      if (!isMatch) throw new AuthenticationError("Password is incorrect");
       const token = await this.authService.generateToken({
         id: user.id,
         email: user.email,
@@ -54,12 +58,15 @@ export class UsersService {
         accessToken: token,
       };
     } catch (error) {
-      console.log(error);
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === "P2025") throw new NotFoundError("User not found");
         throw new AuthenticationError("Email or password not valid");
       }
       throw error;
     }
+  }
+
+  async validate(id: string) {
+    return this.repository.validate(id);
   }
 }

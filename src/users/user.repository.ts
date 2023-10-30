@@ -21,10 +21,18 @@ export class UsersRepository {
     });
   }
 
-  async login({ email, password }: { email: string; password: string }) {
+  async login({ email }: { email: string }) {
     return this.prismaService.user.findFirstOrThrow({
       where: {
         email: email,
+      },
+    });
+  }
+
+  async validate(id: string) {
+    return this.prismaService.user.findFirst({
+      where: {
+        id: id,
       },
     });
   }

@@ -8,5 +8,5 @@ export const setupUsers = () => {
   const usersRepository = new UsersRepository(PrismaService);
   const authService = new AuthService();
   const usersService = new UsersService(usersRepository, authService);
-  return new Elysia().state(() => ({ usersService }));
+  return new Elysia().state(() => ({ usersService, authService }));
 };

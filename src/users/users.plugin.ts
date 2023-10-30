@@ -21,6 +21,7 @@ export const authPlugin = new Elysia().use(setupUsers).group(
           }),
           detail: {
             summary: "Register",
+            tags: ["Auth"],
           },
           response: {
             200: t.Object({
@@ -39,6 +40,21 @@ export const authPlugin = new Elysia().use(setupUsers).group(
         }),
         detail: {
           summary: "Login",
+          tags: ["Auth"],
         },
       })
+      .get(
+        "validate",
+        async ({ request, store }) =>
+          store.usersService.validate(
+            await store.authService.getUserIdFromHeader(request.headers)
+          ),
+        {
+          beforeHandle: app.store.authService.requireLogin,
+          detail: {
+            summary: "Current User",
+            tags: ["Auth"],
+          },
+        }
+      )
 );

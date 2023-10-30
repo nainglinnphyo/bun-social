@@ -28,6 +28,10 @@ export const setupApp = () => {
             version: "v1",
             description: "Mini e-commerce with bun, elysia",
           },
+          tags: [
+            // { name: "App", description: "General endpoints" },
+            { name: "Auth", description: "Authentication endpoints" },
+          ],
         },
         exclude: ["/"],
       })

@@ -12,7 +12,7 @@ export class AuthService {
     return Type.Object({
       payload: Type.Object({
         user: Type.Object({
-          id: Type.Number(),
+          id: Type.String(),
           email: Type.String(),
           username: Type.String(),
         }),
@@ -45,7 +45,6 @@ export class AuthService {
   verifyToken = async (token: string) => {
     const encoder = new TextEncoder();
     const secret = encoder.encode(this.JWT_SECRET);
-
     let verifiedToken;
     try {
       verifiedToken = await jose.jwtVerify(token, secret, {
@@ -55,9 +54,9 @@ export class AuthService {
       console.error(err);
       throw new AuthenticationError("Invalid token");
     }
-    if (!Value.Check(this.VerifiedJwtSchema, verifiedToken))
-      throw new AuthenticationError("Invalid token");
     const userToken = Value.Cast(this.VerifiedJwtSchema, verifiedToken);
+    if (!userToken) throw new AuthenticationError("Invalid token");
+
     return userToken;
   };
 
@@ -67,12 +66,6 @@ export class AuthService {
       throw new AuthenticationError("Missing authorization header");
 
     const tokenParts = rawHeader?.split(" ");
-    const tokenType = tokenParts?.[0];
-    if (tokenType !== "Token")
-      throw new AuthenticationError(
-        "Invalid token type. Expected header format: 'Token jwt'"
-      );
-
     const token = tokenParts?.[1];
     const userToken = await this.verifyToken(token);
     return userToken.payload.user;
