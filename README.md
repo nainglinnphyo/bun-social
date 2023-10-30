@@ -1,9 +1,9 @@
-# Elysia with Bun runtime
+# Social App API using elysia with bun
 
 ## Getting Started
 To get started with this template, simply paste this command into your terminal:
 ```bash
-bun create elysia ./elysia-example
+cd bun-social && cp .env.example .env && bun install
 ```
 
 ## Development
